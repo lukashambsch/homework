@@ -19,19 +19,18 @@ const (
 func ChecksumMiddleware(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// your code goes here ...
+    var keys, headers []string
     rec := httptest.NewRecorder()
     h.ServeHTTP(rec, r)
 
     canonical := strconv.Itoa(rec.Code) + crlf
 
-    var keys []string
     for k, v := range rec.Header() {
       w.Header()[k] = v
       keys = append(keys, k)
     }
     sort.Strings(keys)
 
-    var headers []string
     for _, k := range keys {
       val := rec.Header()[k][0]
       canonical += k + colonspace + val + crlf
@@ -45,8 +44,10 @@ func ChecksumMiddleware(h http.Handler) http.Handler {
         canonical += ";"
       }
     }
+
     canonical += crlf + crlf
     canonical += string(rec.Body.Bytes())
+
     sha := sha1.New()
     sha.Write([]byte(canonical))
 
