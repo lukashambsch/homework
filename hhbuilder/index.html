@@ -83,12 +83,7 @@
 
             function relValidation() {
               var value = relSelect.value;
-              var id = 'noRelError';
-              var noRelDiv = document.getElementById(id) || document.createElement('div');
-              if (!noRelDiv.id) {
-                noRelDiv.id = id;
-                noRelDiv.innerHTML = 'You must choose a relationship.';
-              }
+              var noRelDiv = createErrorMessageDiv('noRelError', 'You must choose a relationship');
               if (!value) {
                 var parent = relSelect.parentNode;
                 validated.rel = false;
@@ -140,11 +135,8 @@
                 householdList.insertBefore(newPerson, null);
                 clearValues();
               } else {
-                var id = 'invalid';
+                var validationFailDiv = createErrorMessageDiv('invalid', 'Please be sure all fields are filled in correctly and try again.');
                 var parent = addButton.parentNode;
-                var validationFailDiv = document.getElementById(id) || document.createElement('div');
-                validationFailDiv.id = id;
-                validationFailDiv.innerHTML = 'Please be sure all fields are filled in correctly and try again.';
                 parent.insertBefore(validationFailDiv, null);
               }
               return false;
@@ -175,12 +167,7 @@
             }
 
             function ageRequiredCheck(value) {
-              var id = 'noAgeError';
-              var noAgeDiv = document.getElementById(id) || document.createElement('div');
-              if (!noAgeDiv.id) {
-                noAgeDiv.id = id;
-                noAgeDiv.innerHTML = 'You must enter an age.';
-              }
+              var noAgeDiv = createErrorMessageDiv('noAgeError', 'You must enter an age.');
               if (!value) {
                 var parent = ageInput.parentNode;
                 validated.age = false;
@@ -194,12 +181,7 @@
             }
 
             function ageGreaterThanZeroCheck(value) {
-              var id = 'invalidAgeError';
-              var invalidAgeDiv = document.getElementById(id) || document.createElement('div');
-              if (!invalidAgeDiv.id) {
-                invalidAgeDiv.id = id;
-                invalidAgeDiv.innerHTML = 'Your age must be a number greater than 0.';
-              }
+              var invalidAgeDiv = createErrorMessageDiv('invalidAgeError', 'Your age must be a number greater than 0.');
               if (isNaN(value) || value <= 0) {
                 var parent = ageInput.parentNode;
                 validated.age = false;
@@ -210,6 +192,15 @@
                   ageInput.nextElementSibling.remove();
                 }
               }
+            }
+
+            function createErrorMessageDiv(id, message) {
+              var errorDiv = document.getElementById(id) || document.createElement('div');
+              if (!errorDiv.id) {
+                errorDiv.id = id;
+                errorDiv.innerHTML = message;
+              }
+              return errorDiv;
             }
           })();
         </script>
