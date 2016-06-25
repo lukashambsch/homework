@@ -72,9 +72,7 @@
 
             function ageValidation() {
               var value = ageInput.value;
-              if (ageInput.nextElementSibling) {
-                ageInput.nextElementSibling.remove();
-              }
+              removeError(ageInput, null);
               ageRequiredCheck(value);
               if (validated.age) {
                 ageGreaterThanZeroCheck(value);
@@ -85,14 +83,9 @@
               var value = relSelect.value;
               var noRelDiv = createErrorMessageDiv('noRelError', 'You must choose a relationship');
               if (!value) {
-                var parent = relSelect.parentNode;
-                validated.rel = false;
-                parent.insertBefore(noRelDiv, null);
+                showError(relSelect, 'rel', noRelDiv);
               } else {
-                validated.rel = true;
-                if (relSelect.nextElementSibling) {
-                  relSelect.nextElementSibling.remove();
-                }
+                removeError(relSelect, 'rel');
               }
             }
 
@@ -107,9 +100,7 @@
                 }
               }
               if (allValidated) {
-                if (addButton.nextElementSibling) {
-                  addButton.nextElementSibling.remove();
-                }
+                removeError(addButton, null);
                 var newPerson = document.createElement('li');
                 var age = document.createElement('div');
                 var rel = document.createElement('div');
@@ -136,8 +127,7 @@
                 clearValues();
               } else {
                 var validationFailDiv = createErrorMessageDiv('invalid', 'Please be sure all fields are filled in correctly and try again.');
-                var parent = addButton.parentNode;
-                parent.insertBefore(validationFailDiv, null);
+                showError(addButton, null, validationFailDiv);
               }
               return false;
 
@@ -169,28 +159,35 @@
             function ageRequiredCheck(value) {
               var noAgeDiv = createErrorMessageDiv('noAgeError', 'You must enter an age.');
               if (!value) {
-                var parent = ageInput.parentNode;
-                validated.age = false;
-                parent.insertBefore(noAgeDiv, null);
+                showError(ageInput, 'age', noAgeDiv);
               } else {
-                validated.age = true;
-                if (ageInput.nextElementSibling) {
-                  ageInput.nextElementSibling.remove();
-                }
+                removeError(ageInput, 'age');
               }
             }
 
             function ageGreaterThanZeroCheck(value) {
               var invalidAgeDiv = createErrorMessageDiv('invalidAgeError', 'Your age must be a number greater than 0.');
               if (isNaN(value) || value <= 0) {
-                var parent = ageInput.parentNode;
-                validated.age = false;
-                parent.insertBefore(invalidAgeDiv, null);
+                showError(ageInput, 'age', invalidAgeDiv);
               } else {
-                validated.age = true;
-                if (ageInput.nextElementSibling) {
-                  ageInput.nextElementSibling.remove();
-                }
+                removeError(ageInput, 'age');
+              }
+            }
+
+            function showError(fieldElement, validationField, errorDiv) {
+              var parent = fieldElement.parentNode;
+              if (validationField) {
+                validated[validationField] = false;
+              }
+              parent.insertBefore(errorDiv, null);
+            }
+
+            function removeError(fieldElement, validationField) {
+              if (validationField) {
+                validated[validationField] = true;
+              }
+              if (fieldElement.nextElementSibling) {
+                fieldElement.nextElementSibling.remove();
               }
             }
 
