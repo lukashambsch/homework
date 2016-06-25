@@ -51,6 +51,167 @@
         <pre class="debug"></pre>
         <script>
             // your code goes here ...
+          (function() {
+            var householdList = document.querySelector('.household');
+            var ageInput = document.querySelector('input[name=age]');
+            var relSelect = document.querySelector('select[name=rel]');
+            var smokerInput = document.querySelector('input[name=smoker]');
+            var addButton = document.querySelector('.add');
+            var submitButton = document.querySelector('button[type=submit]');
+            var debugPre = document.querySelector('.debug');
+            var validated = {
+              age: false,
+              rel: false
+            };
+            var household = {members: []};
+
+            window.onsubmit = submitHousehold;
+            ageInput.onblur = ageValidation;
+            relSelect.onblur = relValidation;
+            addButton.onclick = addPerson;
+
+            function ageValidation() {
+              var value = ageInput.value;
+              if (ageInput.nextElementSibling) {
+                ageInput.nextElementSibling.remove();
+              }
+              ageRequiredCheck(value);
+              if (validated.age) {
+                ageGreaterThanZeroCheck(value);
+              }
+            }
+
+            function relValidation() {
+              var value = relSelect.value;
+              var id = 'noRelError';
+              var noRelDiv = document.getElementById(id) || document.createElement('div');
+              if (!noRelDiv.id) {
+                noRelDiv.id = id;
+                noRelDiv.innerHTML = 'You must choose a relationship.';
+              }
+              if (!value) {
+                var parent = relSelect.parentNode;
+                validated.rel = false;
+                parent.insertBefore(noRelDiv, null);
+              } else {
+                validated.rel = true;
+                if (relSelect.nextElementSibling) {
+                  relSelect.nextElementSibling.remove();
+                }
+              }
+            }
+
+            function addPerson(e) {
+              e.preventDefault();
+              ageValidation();
+              relValidation();
+              var allValidated = true;
+              for (var field in validated) {
+                if (!validated[field]) {
+                  allValidated = false;
+                }
+              }
+              if (allValidated) {
+                if (addButton.nextElementSibling) {
+                  addButton.nextElementSibling.remove();
+                }
+                var newPerson = document.createElement('li');
+                var age = document.createElement('div');
+                var rel = document.createElement('div');
+                var smoker = document.createElement('div');
+                var remove = document.createElement('button');
+                var member = {
+                  age: ageInput.value,
+                  relationship: relSelect.value,
+                  isSmoker: smokerInput.checked
+                };
+                household.members.push(member);
+                remove.innerHTML = 'Remove';
+                remove.type = 'button';
+                remove.class = 'remove';
+                remove.onclick = removeMember;
+                age.innerHTML = 'Age: ' + member.age;
+                rel.innerHTML = 'Relationship: ' + member.relationship;
+                smoker.innerHTML = 'Smoker: ' + member.isSmoker;
+                newPerson.insertBefore(age, null);
+                newPerson.insertBefore(rel, null);
+                newPerson.insertBefore(smoker, null);
+                newPerson.insertBefore(remove, null);
+                householdList.insertBefore(newPerson, null);
+                clearValues();
+              } else {
+                var id = 'invalid';
+                var parent = addButton.parentNode;
+                var validationFailDiv = document.getElementById(id) || document.createElement('div');
+                validationFailDiv.id = id;
+                validationFailDiv.innerHTML = 'Please be sure all fields are filled in correctly and try again.';
+                parent.insertBefore(validationFailDiv, null);
+              }
+              return false;
+
+              function removeMember(e) {
+                if (confirm('Are you sure you wish to remove this member?')) {
+                  var listElements = householdList.querySelectorAll('li');
+                  for (var i = 0; i < listElements.length; i++) {
+                    if (listElements[i] === e.srcElement.parentElement) {
+                      household.members.splice(i, 1);
+                    }
+                  }
+                  e.srcElement.parentElement.remove();
+                }
+              }
+            }
+
+            function submitHousehold(e) {
+              e.preventDefault();
+              debugPre.innerHTML = JSON.stringify(household);
+              debugPre.style.display = 'block';
+            }
+
+            function clearValues() {
+              ageInput.value = '';
+              relSelect.value = '';
+              smokerInput.checked = false;
+            }
+
+            function ageRequiredCheck(value) {
+              var id = 'noAgeError';
+              var noAgeDiv = document.getElementById(id) || document.createElement('div');
+              if (!noAgeDiv.id) {
+                noAgeDiv.id = id;
+                noAgeDiv.innerHTML = 'You must enter an age.';
+              }
+              if (!value) {
+                var parent = ageInput.parentNode;
+                validated.age = false;
+                parent.insertBefore(noAgeDiv, null);
+              } else {
+                validated.age = true;
+                if (ageInput.nextElementSibling) {
+                  ageInput.nextElementSibling.remove();
+                }
+              }
+            }
+
+            function ageGreaterThanZeroCheck(value) {
+              var id = 'invalidAgeError';
+              var invalidAgeDiv = document.getElementById(id) || document.createElement('div');
+              if (!invalidAgeDiv.id) {
+                invalidAgeDiv.id = id;
+                invalidAgeDiv.innerHTML = 'Your age must be a number greater than 0.';
+              }
+              if (isNaN(value) || value <= 0) {
+                var parent = ageInput.parentNode;
+                validated.age = false;
+                parent.insertBefore(invalidAgeDiv, null);
+              } else {
+                validated.age = true;
+                if (ageInput.nextElementSibling) {
+                  ageInput.nextElementSibling.remove();
+                }
+              }
+            }
+          })();
         </script>
     </body>
 </html>
