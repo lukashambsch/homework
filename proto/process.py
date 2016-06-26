@@ -1,12 +1,17 @@
 import struct
 
 
+debit_type = 'debit'
+credit_type = 'credit'
+start_auto_type = 'start_auto'
+end_auto_type = 'end_auto'
 record_types = {
-    '\x00': 'debit',
-    '\x01': 'credit',
-    '\x02': 'start_auto',
-    '\x03': 'end_auto',
+    '\x00': debit_type,
+    '\x01': credit_type,
+    '\x02': start_auto_type,
+    '\x03': end_auto_type,
 }
+checked_user_id = 2456938384156277127
 
 
 def process():
@@ -20,17 +25,17 @@ def process():
         _, _, num = read_header(f)
         for i in range(num):
             record_type, timestamp, user_id, amount = read_record(f)
-            if record_type == 'debit':
+            if record_type == debit_type:
                 debit_dollars += amount
-                if user_id == 2456938384156277127:
+                if user_id == checked_user_id:
                     user_balance += amount
-            if record_type == 'credit':
+            if record_type == credit_type:
                 credit_dollars += amount
-                if user_id == 2456938384156277127:
+                if user_id == checked_user_id:
                     user_balance -= amount
-            if record_type == 'start_auto':
+            if record_type == start_auto_type:
                 started_autopays += 1
-            if record_type == 'end_auto':
+            if record_type == end_auto_type:
                 ended_autopays += 1
             print('Record Type: {}, Time: {}, UserId: {}, Amount: {}'
                   .format(record_type, timestamp, user_id, amount))
@@ -49,7 +54,7 @@ def read_record(f):
     timestamp, = struct.unpack('!I', f.read(4))
     user_id, = struct.unpack_from('!Q', f.read(8))
     amount = None
-    if record_type in ['debit', 'credit']:
+    if record_type in [debit_type, credit_type]:
         amount, = struct.unpack_from('!d', f.read(8))
     return record_type, timestamp, user_id, amount
 
